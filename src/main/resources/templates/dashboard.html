@@ -1,0 +1,284 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Dashboard</title>
+    <link href="/assets/css/bootstrap.css" rel="stylesheet" />
+    <link href="/assets/css/font-awesome.css" rel="stylesheet" />
+    <link href="/assets/css/custom.css" rel="stylesheet" />
+    <script>
+        // Fetch student data and populate logout section with email
+		
+		
+		function parseJwt(token) {
+		    const base64Url = token.split('.')[1];
+		    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+		    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+		        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+		    }).join(''));
+		    return JSON.parse(jsonPayload);
+		}
+		
+		
+		async function fetchStudentAllData() {
+		    const token = localStorage.getItem('token');
+		    if (!token) {
+		        alert('No token found. Please log in again.');
+		        window.location.href = '/login';
+		        return;
+		    }
+
+		    try {
+		        const response = await fetch('/api/students/all-student-data-list', {
+		            method: 'GET',
+		            headers: { 'Authorization': `Bearer ${token}` },
+		        });
+				
+				console.log("ok = "+response.ok)
+				console.log("response = "+response)
+
+		        if (response.ok) {
+		            const students = await response.json();
+		            displayStudentData(students);
+		        } else {
+		            const errorData = await response.json();
+		            alert(`Failed to fetch all student data: ${errorData.message}`);
+		        }
+		    } catch (error) {
+		        console.error('Error fetching all student data:', error);
+		        alert('An error occurred while fetching all student data.');
+		    }
+		}
+
+		// Function to display student data in the table
+		function displayStudentData(students) {
+		    const tbody = document.querySelector('tbody'); // Select the table body
+		    tbody.innerHTML = ''; // Clear existing data
+
+		    if (students.length === 0) {
+		        const row = document.createElement('tr');
+		        row.innerHTML = '<td colspan="4" class="error-message">No students found.</td>';
+		        tbody.appendChild(row);
+		        return;
+		    }
+
+		    students.forEach((student, index) => {
+		        const row = document.createElement('tr');
+		        row.innerHTML = `
+		            <td>${index + 1}</td>
+		            <td>${student.id}</td>
+		            <td>${student.name}</td>
+		            <td>${student.email}</td>
+		        `;
+		        tbody.appendChild(row);
+		    });
+		}
+
+		
+		
+		
+		
+		
+
+        async function fetchStudentData() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('No token found. Please log in again.');
+                window.location.href = '/login';
+                return;
+            }
+			
+			if (token) {
+			    const payload = parseJwt(token);
+			    localStorage.setItem('role', payload.role); // ROLE_TEACHER ya ROLE_STUDENT
+			}
+			
+			role = localStorage.getItem('role');
+			console.log("role = "+role);
+            try {
+                const response = await fetch('/api/students/studentdata', {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                });
+
+                if (response.ok) {
+                    const studentData = await response.json();
+					const role_data = localStorage.getItem('role');
+					if(role == "ROLE_TEACHER"){
+						fetchStudentAllData();
+					}
+					
+					document.getElementById('studentName').innerText = "Hello, " + studentData.name;
+                    document.getElementById('studentEmail').innerText = studentData.email;
+                } else {
+                    const errorData = await response.json();
+                    alert(`Failed to fetch student data: ${errorData.message}`);
+                }
+            } catch (error) {
+                console.error('Error fetching student data:', error);
+                alert('An error occurred while fetching student data.');
+            }
+        }
+
+        // Log out function
+        function logOutFun() {
+            localStorage.removeItem('token');
+            window.location.href = '/api/students/login';
+        }
+
+        // Toggle submenu for Assignments
+        function toggleAssignmentsMenu() {
+            const submenu = document.getElementById('assignmentSubmenu');
+            submenu.classList.toggle('show');
+        }
+
+        window.onload = fetchStudentData;
+    </script>
+    <style>
+        /* Dropdown styling for logout section */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <!-- Navbar -->
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="adjust-nav">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/api/students/"><i class="fa fa-square-o "></i>&nbsp;E-LEARNING</a>
+                </div>
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                            <a href="#" id="studentEmail">Loading...</a>
+                            <div class="dropdown-content">
+                                <a href="#" onclick="logOutFun()">Logout</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- /. NAV TOP  -->
+        
+        <!-- Sidebar -->
+        <nav class="navbar-default navbar-side" role="navigation">
+            <div class="sidebar-collapse">
+                <ul class="nav" id="main-menu">
+                    <li class="text-center user-image-back">
+                        <img src="/assets/img/find_user.png" class="img-responsive" />
+                    </li>
+
+                    <li><a href="/api/students/dashboard"><i class="fa fa-desktop "></i>Dashboard</a></li>
+                    <li><a href="#"><i class="fa fa-table "></i>Fee Payment</a></li>
+                    <li><a href="#"><i class="fa fa-edit "></i>Forms </a></li>
+                    
+                    <!-- Assignment Menu -->
+                    <li>
+                        <a href="#" onclick="toggleAssignmentsMenu()"><i class="fa fa-sitemap "></i>Assignments <span class="fa arrow"></span></a>
+                        <ul id="assignmentSubmenu" class="nav nav-second-level" style="display:none;">
+                            <li><a href="#">Hindi Assignment</a></li>
+                            <li><a href="#">English Assignments</a></li>
+                            <li>
+                                <a href="#">Math Assignments <span class="fa arrow"></span></a>
+                                <ul class="nav nav-third-level">
+                                    <li><a href="#">Assignment 1</a></li>
+                                    <li><a href="#">Assignment 2</a></li>
+                                    <li><a href="#">Assignment 3</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+					
+					
+					<li><a href="#"><i class="fa fa-bar-chart-o"></i>Fee Payment</a></li>
+                    <li><a href="#"><i class="fa fa-bar-chart-o"></i>Performance Chart</a></li>
+                    <li><a href="#"><i class="fa fa-edit "></i>Class Time Table</a></li>
+                    <li><a href="blank.html"><i class="fa fa-table "></i>Holiday Chart</a></li>
+					<li><a href="#" onclick="logOutFun()"><i class="fa fa-sign-out"></i>Logout</a></li>
+                </ul>
+            </div>
+        </nav>
+        <!-- /. NAV SIDE  -->
+
+        <!-- Page Content -->
+        <div id="page-wrapper">
+            <div id="page-inner">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 id="studentName"></h2>
+                    </div>
+			
+                </div>
+				<div class="row">
+				                   <div class="col-md-6">
+				                       <h5>Table  Sample One</h5>
+				                       <table class="table table-striped table-bordered table-hover">
+				                           <thead>
+				                               <tr>
+				                                   <th>#</th>
+				                                   <th>Student ID</th>
+				                                   <th>Student Name</th>
+				                                   <th>Student Email ID</th>
+				                               </tr>
+				                           </thead>
+				                           <tbody>
+				                              
+				                           </tbody>
+				                       </table>
+
+				                   </div>
+				                  
+				               </div>
+				               <!-- /. ROW  -->
+                <!-- /. ROW  -->
+            </div>
+            <!-- /. PAGE INNER  -->
+        </div>
+        <!-- /. PAGE WRAPPER  -->
+    </div>
+    <!-- /. WRAPPER  -->
+
+    <script src="/assets/js/jquery-1.10.2.js"></script>
+    <script src="/assets/js/bootstrap.min.js"></script>
+    <script src="/assets/js/custom.js"></script>
+</body>
+</html>

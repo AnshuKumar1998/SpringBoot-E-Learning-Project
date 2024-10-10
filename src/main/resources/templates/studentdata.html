@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Data</title>
+    <script>
+        async function fetchStudentData() {
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                alert('No token found. Please log in again.');
+                window.location.href = '/login';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/students/studentdata', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`, 
+                    },
+                });
+
+                if (response.ok) {
+                    const studentData = await response.json();
+                    console.log('Student Data:', studentData);
+
+                    document.getElementById('studentName').innerText = studentData.name;
+                    document.getElementById('studentEmail').innerText = studentData.email;
+                } else {
+                    const errorData = await response.json();
+                    alert(`Failed to fetch student data: ${errorData.message}`);
+                }
+            } catch (error) {
+                console.error('Error fetching student data:', error);
+                alert('An error occurred while fetching student data.');
+            }
+        }
+		
+		function logOutFun(){
+			
+			   localStorage.removeItem('token');
+			   window.location.href = '/login'; 
+			
+		}
+
+
+        window.onload = fetchStudentData;
+    </script>
+</head>
+<body>
+    <h1>Welcome, Student</h1>
+    <div>
+        <p>Name: <span id="studentName"></span></p>
+        <p>Email: <span id="studentEmail"></span></p>
+    </div>
+    <form method="post" action="/logout">
+        <button type="submit" onClick="logOutFun()">Logout</button>
+    </form>
+</body>
+</html>
