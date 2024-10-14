@@ -30,9 +30,9 @@ public class JwtUtil {
                 .setSigningKey(secret)
                 .parseClaimsJws(token)
                 .getBody()
-                .get("role", String.class); 
+                .get("role", String.class);
     }
-    
+
     public String extractEmail(String token) {
         return Jwts.parser()
                 .setSigningKey(secret)

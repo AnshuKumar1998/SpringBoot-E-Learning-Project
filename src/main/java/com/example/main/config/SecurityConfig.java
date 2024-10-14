@@ -22,9 +22,9 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/students/login", 
-                		"/api/students/register", 
-                		"/api/students/", 
+                .requestMatchers("/api/students/login",
+                		"/api/students/register",
+                		"/api/students/",
                 		"/api/students/studentprocessing",
                 		"/api/students/contact",
                 		"/api/students/about",
@@ -32,24 +32,28 @@ public class SecurityConfig {
                 		"/api/students/404",
                 		"/api/students/team",
                 		"/api/students/testimonial",
-                		 "/css/**",   
-                         "/js/**",     
-                         "/img/**", 
-                         "/lib/**", 
+                		"/api/students/update/{id}",
+                		"/api/students/studentdata/{id}",
+                		"/api/studentDirectory/createContact",
+                		 "/css/**",
+                         "/js/**",
+                         "/img/**",
+                         "/lib/**",
                          "/scss/**",
-                         "/assets/**" 
-                         
+                         "/assets/**",
+                         "/uploaded-student-data/**"
+
                 		).permitAll()
-                .requestMatchers("/api/students/dashboard","/api/students/studentprocessing").hasRole("TEACHER") 
+                .requestMatchers("/api/students/dashboard","/api/students/studentprocessing").hasRole("TEACHER")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        
+
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-    
-    
+
+
 }

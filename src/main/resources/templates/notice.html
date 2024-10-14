@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head th:replace="dashboard-head :: dashboard-head">
+		<script>
+				  
+					
+					function parseJwt(token) {
+					    const base64Url = token.split('.')[1];
+					    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+					    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+					        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+					    }).join(''));
+					    return JSON.parse(jsonPayload);
+					}
+					
+					
+					async function fetchStudentAllData() {
+					    const token = localStorage.getItem('token');
+					    if (!token) {
+					        alert('No token found. Please log in again.');
+					        window.location.href = '/login';
+					        return;
+					    }
+
+					    try {
+					        const response = await fetch('/api/students/all-student-data-list', {
+					            method: 'GET',
+					            headers: { 'Authorization': `Bearer ${token}` },
+					        });
+							
+							console.log("ok = "+response.ok)
+							console.log("response = "+response)
+
+					        if (response.ok) {
+					            const students = await response.json();
+					            displayStudentData(students);
+					        } else {
+					            const errorData = await response.json();
+					            alert(`Failed to fetch all student data: ${errorData.message}`);
+					        }
+					    } catch (error) {
+					        console.error('Error fetching all student data:', error);
+					        alert('An error occurred while fetching all student data.');
+					    }
+					}
+
+					async function fetchStudentData() {
+					    const token = localStorage.getItem('token');
+					    if (!token) {
+					        alert('No token found. Please log in again.');
+					        window.location.href = '/login';
+					        return;
+					    }
+
+					    try {
+					        const response = await fetch('/api/students/noticeDataAll', {
+					            method: 'GET',
+					            headers: { 'Authorization': `Bearer ${token}` },
+					        });
+							
+							console.log(response);
+
+					        if (response.ok) {
+					            const studentData = await response.json();
+								displayStudentDetails(studentData);
+								
+					            document.getElementById('studentHeadingName').innerText = "Hello, " + studentData.name;
+					            document.getElementById('studentheadingEmail').innerText = studentData.email;
+								displayStudentDetails(studentData);
+								console.log(studentData);
+								
+								const imagePath = studentData.imageBase64.replace('src/main/resources/static', ''); 
+								document.getElementById('studentImage').src = imagePath; 
+
+					        } else {
+					            const errorData = await response.json();
+					            alert(`Failed to fetch student data: ${errorData.message}`);
+					        }
+					    } catch (error) {
+					        console.error('Error fetching student data:', error);
+					        alert('An error occurred while fetching student data.');
+					    }
+					}
+
+
+
+				    // Toggle submenu for Assignments
+				    function toggleAssignmentsMenu() {
+				        const submenu = document.getElementById('assignmentSubmenu');
+				        submenu.classList.toggle('show');
+				    }
+
+				    window.onload = fetchStudentData;
+				</script>
+				<style>
+				    /* Dropdown styling for logout section */
+				    .dropdown {
+				        position: relative;
+				        display: inline-block;
+				    }
+
+				    .dropdown-content {
+				        display: none;
+				        position: absolute;
+				        right: 0;
+				        background-color: #f9f9f9;
+				        min-width: 160px;
+				        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+				        z-index: 1;
+				    }
+
+				    .dropdown-content a {
+				        color: black;
+				        padding: 12px 16px;
+				        text-decoration: none;
+				        display: block;
+				    }
+
+				    .dropdown-content a:hover {
+				        background-color: #f1f1f1;
+				    }
+
+				    .dropdown:hover .dropdown-content {
+				        display: block;
+				    }
+
+				    .show {
+				        display: block;
+				    }
+				</style>
+	</head>
+<body>
+    <div id="wrapper">
+		<!-- Navbar -->
+		       <div class="navbar navbar-inverse navbar-fixed-top">
+		           <div class="adjust-nav">
+		               <div class="navbar-header">
+		                   <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
+		                       <span class="icon-bar"></span>
+		                       <span class="icon-bar"></span>
+		                       <span class="icon-bar"></span>
+		                   </button>
+		                   <a class="navbar-brand" href="/api/students/"><i class="fa fa-square-o "></i>&nbsp;E-LEARNING</a>
+		               </div>
+		               <div class="navbar-collapse collapse">
+		                   <ul class="nav navbar-nav navbar-right">
+		                       <li class="dropdown">
+		                           <a href="#" id="studentheadingEmail">Loading...</a>
+		                           <div class="dropdown-content">
+		                               <a href="#" onclick="logOutFun()">Logout</a>
+		                           </div>
+		                       </li>
+		                   </ul>
+		               </div>
+		           </div>
+		       </div>
+		       <!-- /. NAV TOP  -->
+			   
+		       
+			<!-- Navbar Start -->
+				<div th:replace="dashboard-sidebar :: dashboard-sidebar"></div>
+				  <!-- Navbar End -->
+				  
+
+        <div id="page-wrapper">
+            <div id="page-inner">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2>Notices</h2>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div id="noticeList">
+                            <!-- Notices will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/js/jquery-1.10.2.js"></script>
+    <script src="/assets/js/bootstrap.min.js"></script>
+    <script src="/assets/js/custom.js"></script>
+	
+</body>
+</html>

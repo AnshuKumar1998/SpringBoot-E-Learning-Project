@@ -22,7 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (student == null) {
             throw new UsernameNotFoundException("User not found with email: " + email);
         }
-        
+
         String role = student.getEmail().endsWith("@learning.com") ? "ROLE_TEACHER" : "ROLE_USER";
 
         // Convert the Student to UserDetails (you may need a custom implementation)

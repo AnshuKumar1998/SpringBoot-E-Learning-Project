@@ -9,5 +9,7 @@ import com.example.main.model.Student;
 public interface StudentRepository extends MongoRepository<Student, String> {
 
 	 Student findByEmail(String email);
-
+	 
+	 
+	 
 }

@@ -1,0 +1,43 @@
+<th:block th:fragment="dashboard-sidebar">
+<!-- Sidebar -->
+       <nav class="navbar-default navbar-side" role="navigation">
+           <div class="sidebar-collapse">
+               <ul class="nav" id="main-menu">
+                   <li class="text-center user-image-back" style="text-align: center; background-color: white; padding: 20px;">
+					<img id="studentImage" src="/assets/img/find_user.png" class="img-responsive" alt="Student Image" style="width: 150px; height: 150px;" />
+
+                   </li>
+
+                   <li><a href="/api/students/dashboard"><i class="fa fa-desktop "></i>Dashboard</a></li>
+                   <li><a href="#"><i class="fa fa-table "></i>Fee Payment</a></li>
+                   <li><a href="#"><i class="fa fa-edit "></i>Forms </a></li>
+                   
+                   <!-- Assignment Menu -->
+                   <li>
+                       <a href="#" onclick="toggleAssignmentsMenu()"><i class="fa fa-sitemap "></i>Assignments <span class="fa arrow"></span></a>
+                       <ul id="assignmentSubmenu" class="nav nav-second-level" style="display:none;">
+                           <li><a href="#">Hindi Assignment</a></li>
+                           <li><a href="#">English Assignments</a></li>
+                           <li>
+                               <a href="#">Math Assignments <span class="fa arrow"></span></a>
+                               <ul class="nav nav-third-level">
+                                   <li><a href="#">Assignment 1</a></li>
+                                   <li><a href="#">Assignment 2</a></li>
+                                   <li><a href="#">Assignment 3</a></li>
+                               </ul>
+                           </li>
+                       </ul>
+                   </li>
+				
+				
+				<li><a href="#"><i class="fa fa-bar-chart-o"></i>Fee Payment</a></li>
+                   <li><a href="#"><i class="fa fa-bar-chart-o"></i>Performance Chart</a></li>
+                   <li><a href="#"><i class="fa fa-edit "></i>Class Time Table</a></li>
+				<li><a href="/api/students/notice"><i class="fa fa-edit "></i>Notice</a></li>
+                   <li><a href="blank.html"><i class="fa fa-table "></i>Holiday Chart</a></li>
+				<li><a href="#" onclick="logOutFun()"><i class="fa fa-sign-out"></i>Logout</a></li>
+               </ul>
+           </div>
+       </nav>
+       <!-- /. NAV SIDE  -->
+</th:block>
